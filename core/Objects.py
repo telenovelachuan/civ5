@@ -17,3 +17,20 @@ class Tile():
     def neighbors(self):
         neighbors = [self.left, self.left_up, self.right_up, self.right, self.right_down, self.left_down]
         return [t for t in neighbors if t is not None]
+    
+    @property
+    def food(self):
+        if self.terrain in ["grassland", "ocean"]:
+            return 2
+        elif self.terrain == "plain":
+            return 1
+        else:
+            return 0
+        
+    @property
+    def production(self):
+        if self.terrain == "hill":
+            return 2
+        elif self.terrain == "plain":
+            return 1
+        return 0

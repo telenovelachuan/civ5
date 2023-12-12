@@ -101,7 +101,23 @@ def init_terrain(tiles):
         for _tile in tiles_to_assign:
             if _tile.terrain is not None:
                 continue
-            _tile.terrain = "grassland" if random.random() >= vicinity * 0.10 else "ocean"
+
+            _terrain = "land" if random.random() >= vicinity * 0.10 else "ocean"
+            if _terrain == "land":
+                # grassland, mountain, desert, plain, jungle
+                _random = random.random()
+                if _random <= 0.1:
+                    _terrain = "mountain"
+                elif _random > 0.1 and _random <= 0.3:
+                    _terrain = "desert"
+                elif _random > 0.3 and _random <= 0.5:
+                    _terrain = "jungle"
+                elif _random > 0.5 and _random <= 0.75:
+                    _terrain = "grassland"
+                else:
+                    _terrain = "plain"
+
+            _tile.terrain = _terrain
             
             existing_pos = [t.pos for t in new_tiles_to_assign]
             new_tiles_to_assign.extend([t for t in _tile.neighbors if t.terrain is None and t.pos not in existing_pos])
