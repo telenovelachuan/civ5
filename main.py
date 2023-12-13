@@ -1,13 +1,13 @@
 import pygame
-from core.Game import init_tiles, init_terrain
-from core.Graphics import draw_hexagons, tile_hover
+from core.Game import init_tiles, init_terrain, init_civilizations
+from core.Graphics import draw_hexagons, draw_units, handle_events
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 screen_size_x, screen_size_y = screen.get_size()
 tiles = init_tiles(screen_size_x, screen_size_y)
 tiles = init_terrain(tiles)
-
+init_civilizations(1, tiles)
 
 running = True
 while running:
@@ -15,6 +15,7 @@ while running:
     
     
     hexes = draw_hexagons(screen, tiles)
+    unit_circles = draw_units(screen, tiles)
 
     # # hover over tiles
     # for _pos, _hex_list in hexes.items():
@@ -23,11 +24,7 @@ while running:
     #         tile_hover(screen, _tile)
 
     pygame.display.flip()
+    running = handle_events(unit_circles, hexes)
 
-    ev = pygame.event.get()
-    for event in ev:
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            #import pdb; pdb.set_trace()
-            running = False
     
 pygame.quit()

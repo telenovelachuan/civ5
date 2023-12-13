@@ -6,6 +6,11 @@ LAND_SEED_NUM = 2
 
 tile_radius = Objects.TILE_RADIUS
 tile_perpd = round(Objects.TILE_RADIUS / 2 * sqrt(3), 2)
+CIVILIZATIONS = ["French", "English", "Chinese", "Mongolian", "Babylonian", "Korean", "Spanish", "Portuguese", "German", "Byzantine", 
+                 "American", "Dutch", "Swedish", "Siamese", "Indonesian", "Shoshone", "Mayan", "Brazilian", "Incan", "Celtic",
+                 "Ottoman", "Egyptian", "Songhai", "Carthaginian", "Roman", "Russian", "Japanese", "Indian", "Assyrian", "Moroccan",
+                 "Arabian", "Austrian", "Aztec", "Danish", "Ethiopian", "Greek", "Hunnic", "Iroquois", "Persian", "Polish",
+                 "Polynesian", "Venetian", "Zulu"]
 
 def init_tiles(screen_size_x, screen_size_y):
     first_pos = (tile_perpd, tile_radius)
@@ -126,3 +131,19 @@ def init_terrain(tiles):
         tiles_to_assign = new_tiles_to_assign
     
     return tiles
+
+def init_civilizations(num_of_civs, all_tiles):
+    player_civ_name = random.choice(CIVILIZATIONS)
+    player_civ = Objects.Civilization(player_civ_name, all_tiles)
+
+    civs = random.sample(CIVILIZATIONS, num_of_civs)
+    all_civs = [player_civ]
+    for civ_name in civs:
+        all_civs.append(Objects.Civilization(civ_name, all_tiles))
+
+def get_selected_unit(unit_circles):
+    for _unit, _circle in unit_circles.items():
+        if _unit.selected:
+            return _unit
+    return None
+
