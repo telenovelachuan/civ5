@@ -1,3 +1,4 @@
+import math
 from . import Objects
 
 DIR_OPPOSITES = {
@@ -114,7 +115,64 @@ def calc_route2(tile1, tile2):
         cur_node = new_node
 
     return results
+
+def get_peripheral(screen, radius, tile, all_tiles):
+    screen_x, screen_y = screen.get_size()
+    if radius == 1:
+        return tile.neighbors
+    row_capacity = math.ceil(screen_x / (tile.radius * math.sqrt(3)))
+    #left_most = all_tiles[str(int(tile.seq) - radius)]
+    left_most = int(tile.seq) - radius
+    #left_up_most = all_tiles[str(int(tile.seq) - radius * row_capacity)]
+    left_up_most = int(tile.seq) - radius * row_capacity
+    #right_up_most = all_tiles[str(int(tile.seq) - radius * (row_capacity - 1))]
+    right_up_most = int(tile.seq) - radius * (row_capacity - 1)
+    #right_most = all_tiles[str(int(tile.seq) + radius)]
+    right_most = int(tile.seq) + radius
+    #right_down_most = all_tiles[str(int(tile.seq) + radius * row_capacity)]
+    right_down_most = int(tile.seq) + radius * row_capacity
+    #left_down_most = all_tiles[str(int(tile.seq) + radius * (row_capacity - 1))]
+    left_down_most = int(tile.seq) + radius * (row_capacity - 1)
+
+    edge1 = list(range(left_most, left_up_most, -(row_capacity - 1))) # left up edge
+    edge2 = list(range(left_up_most, right_up_most, 1)) # up edge
+    edge3 = list(range(right_up_most, right_most, row_capacity)) # right up edge
+    edge4 = list(range(right_most, right_down_most, row_capacity - 1)) # right down edge
+    edge5 = list(range(right_down_most, left_down_most, -1)) # down edge
+    edge6 = list(range(left_down_most, left_most, -row_capacity)) # left down edge
+
+    all_tile_seqs = edge1 + edge2 + edge3 + edge4 + edge5 + edge6
+    # remove illegal tiles
+    all_tile_seqs = [seq for seq in all_tile_seqs if seq > 0 and seq < len(all_tiles)]
+    right_walls = []
+
+    return [all_tiles[str(seq)] for seq in all_tile_seqs]
+
+
+
+def get_accessible_tiles(screen, all_tiles, tile, move):
+    # results = {}
+    # for _t in tile.neighbors:
+    #     results[_t] = move - _t.move_consumption
+
     
+    # search_stack = [_t for _t, _move in results.items() if _move > 0]
+    # while len(search_stack) > 0:
+    #     new_search_stack = []
+    #     for _t in search_stack:
+    #         for _n in _t.neighbors:
+    #             if _n not in results:
+    #                 _remaining = results[_t] - _n.move_consumption
+    #                 results[_n] = _remaining
+    #                 if _remaining > 0:
+    #                     new_search_stack.append(_n)
+
+    #     search_stack = new_search_stack
+
+    #return tile.neighbors
+    tiles = get_peripheral(screen, move, tile, all_tiles) 
+    return tiles
+
 
 def calc_moves(move_limit, path=None, tile1=None, tile2=None):
     moves = 0

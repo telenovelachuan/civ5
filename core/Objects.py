@@ -15,6 +15,8 @@ class Tile():
         self.terrain = None
         self.unit = None
         self.tag = None
+        self.seq = None
+    
     
     @property
     def neighbors(self):
@@ -58,13 +60,13 @@ class Civilization():
 
 
 class Unit():
-    def __init__(self, unit_type, tile, owner):
+    def __init__(self, unit_type, tile, owner, moves=2):
         self.type = unit_type
         self.tile = tile
         self.owner = owner
         self.pos = self.tile.pos
         self.selected = False
-        self.moves = 2
+        self.moves = moves
 
     def move_to(self, new_tile):
         self.pos = new_tile.pos

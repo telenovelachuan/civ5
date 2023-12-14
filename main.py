@@ -1,11 +1,12 @@
 import pygame
 from core.Game import init_tiles, init_terrain, init_civilizations
-from core.Graphics import draw_hexagons, draw_units, handle_events
+from core.Graphics import draw_hexagons, draw_units, init_screen
+from core.Events import handle_events
+from core.Utils import get_peripheral
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
-screen_size_x, screen_size_y = screen.get_size()
-tiles = init_tiles(screen_size_x, screen_size_y)
+screen = init_screen()
+tiles = init_tiles(*screen.get_size())
 tiles = init_terrain(tiles)
 init_civilizations(1, tiles)
 
@@ -24,7 +25,7 @@ while running:
     #         tile_hover(screen, _tile)
 
     pygame.display.flip()
-    running = handle_events(unit_circles, hexes)
+    running = handle_events(screen, unit_circles, tiles, hexes)
 
     
 pygame.quit()

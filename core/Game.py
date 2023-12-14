@@ -90,7 +90,25 @@ def init_tiles(screen_size_x, screen_size_y):
                 results[(right_down_x, right_down_y)] = _tile
 
         new_tiles_to_expand = updated_new_tiles
+    
+    # seq = 0
+    # for _t in results.values():
+    #     _t.seq = str(seq)
+    #     seq += 1
+    assign_seq(list(results.values()))
+    results = {t.seq: t for t in results.values()}
     return results
+
+def assign_seq(all_tiles):
+    num_assigned = 0
+    _row_start = all_tiles[0]
+    while num_assigned < len(all_tiles):
+        _row_cur = _row_start
+        while _row_cur is not None:
+            _row_cur.seq = str(num_assigned)
+            num_assigned += 1
+            _row_cur = _row_cur.right
+        _row_start = _row_start.left_down or _row_start.right_down
 
 def init_terrain(tiles):
     # randomize 2 large continents
