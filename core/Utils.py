@@ -116,71 +116,95 @@ def calc_route2(tile1, tile2):
 
     return results
 
-def get_peripheral(screen, radius, tile, all_tiles):
-    screen_x, screen_y = screen.get_size()
+def get_peripheral(screen, all_tiles, tile, radius, ignore_terrain=True):
+    seq_x, seq_y = tile.seq.split("^")
+    seq_x, seq_y = float(seq_x), float(seq_y)
+    results = []
+    if radius == 0:
+        return [tile]
     if radius == 1:
         return tile.neighbors
-    row_capacity = math.ceil(screen_x / (tile.radius * math.sqrt(3)))
-    #left_most = all_tiles[str(int(tile.seq) - radius)]
-    left_most = int(tile.seq) - radius
-    #left_up_most = all_tiles[str(int(tile.seq) - radius * row_capacity)]
-    left_up_most = int(tile.seq) - radius * row_capacity
-    #right_up_most = all_tiles[str(int(tile.seq) - radius * (row_capacity - 1))]
-    right_up_most = int(tile.seq) - radius * (row_capacity - 1)
-    #right_most = all_tiles[str(int(tile.seq) + radius)]
-    right_most = int(tile.seq) + radius
-    #right_down_most = all_tiles[str(int(tile.seq) + radius * row_capacity)]
-    right_down_most = int(tile.seq) + radius * row_capacity
-    #left_down_most = all_tiles[str(int(tile.seq) + radius * (row_capacity - 1))]
-    left_down_most = int(tile.seq) + radius * (row_capacity - 1)
+    
+    results.append(f"{seq_x:g}^{seq_y - radius:g}")
+    results.append(f"{seq_x:g}^{seq_y + radius:g}")
+    for _n in range(1, radius + 1):
+        results.append(f"{seq_x + _n:g}^{seq_y - radius + 0.5 * _n:g}")
+        results.append(f"{seq_x + _n:g}^{seq_y + radius - _n * 0.5:g}")
+        results.append(f"{seq_x - _n:g}^{seq_y - radius + 0.5 * _n:g}")
+        results.append(f"{seq_x - _n:g}^{seq_y + radius - _n * 0.5:g}")
 
-    edge1 = list(range(left_most, left_up_most, -(row_capacity - 1))) # left up edge
-    edge2 = list(range(left_up_most, right_up_most, 1)) # up edge
-    edge3 = list(range(right_up_most, right_most, row_capacity)) # right up edge
-    edge4 = list(range(right_most, right_down_most, row_capacity - 1)) # right down edge
-    edge5 = list(range(right_down_most, left_down_most, -1)) # down edge
-    edge6 = list(range(left_down_most, left_most, -row_capacity)) # left down edge
+    up_corners = [r for r in results if float(r.split("^")[0]) == seq_x - radius]
+    up_corner_ys = [float(r.split("^")[1]) for r in up_corners]
+    min_y, max_y = min(up_corner_ys), max(up_corner_ys)
+    y_range = [y / 10 for y in range(int(10 * min_y), int(10 * max_y), 5)]
+    up_edge = [f"{seq_x - radius:g}^{_y:g}" for _y in y_range]
+    results.extend(up_edge)
 
-    all_tile_seqs = edge1 + edge2 + edge3 + edge4 + edge5 + edge6
-    # remove illegal tiles
-    all_tile_seqs = [seq for seq in all_tile_seqs if seq > 0 and seq < len(all_tiles)]
-    right_walls = []
+    down_corners = [r for r in results if float(r.split("^")[0]) == seq_x + radius]
+    down_corner_ys = [float(r.split("^")[1]) for r in down_corners]
+    min_y, max_y = min(down_corner_ys), max(down_corner_ys)
+    y_range = [y / 10 for y in range(int(10 * min_y), int(10 * max_y), 5)]
+    down_edge = [f"{seq_x + radius:g}^{_y:g}" for _y in y_range]
+    results.extend(down_edge)
 
-    return [all_tiles[str(seq)] for seq in all_tile_seqs]
+    results = list(set(results))
+    results = [r for r in results if r in all_tiles]
+    results = [all_tiles[seq] for seq in results]
+    if ignore_terrain == False:
+        results = [r for r in results if r.terrain != "mountain"]
 
+    return results
+
+
+# def get_right_wall(screen_x, tile_radius, num_all_tiles):
+#     row_capacity = math.ceil(screen_x / (tile_radius * math.sqrt(3)))
+#     cur_seq = row_capacity - 1 # start from 0
+#     last_seq = num_all_tiles - 1
+#     results = [cur_seq]
+#     step = 24
+#     while cur_seq <= last_seq:
+#         cur_seq += step
+#         results.append(cur_seq)
+#         step = 25 if step == 24 else 24
+#         if cur_seq == last_seq:
+#             break
+#     return results
+    
 
 
 def get_accessible_tiles(screen, all_tiles, tile, move):
-    # results = {}
-    # for _t in tile.neighbors:
-    #     results[_t] = move - _t.move_consumption
+    results = {tile: move}
+    previous_ring = [tile]
+    for _n in range(1, move + 1):
+        if all([_m <= 0 for _m in results.values()]) == True:
+            break
+        ring = get_peripheral(screen, all_tiles, tile, _n, ignore_terrain=False)
+        for _tile in ring:
+            # skip if not accessible
+            for _pre_tile in previous_ring:
+                
+                if _tile not in _pre_tile.neighbors:
+                    continue
+                new_moves = results[_pre_tile] - _tile.move_consumption
+                if _tile in results:
+                    results[_tile].append(new_moves)
+                else:
+                    results[_tile] = [new_moves]
+        for _t, _m in results.items():
+            results[_t] = _m if isinstance(_m, int) else max(_m)  # get the least consumption move
 
-    
-    # search_stack = [_t for _t, _move in results.items() if _move > 0]
-    # while len(search_stack) > 0:
-    #     new_search_stack = []
-    #     for _t in search_stack:
-    #         for _n in _t.neighbors:
-    #             if _n not in results:
-    #                 _remaining = results[_t] - _n.move_consumption
-    #                 results[_n] = _remaining
-    #                 if _remaining > 0:
-    #                     new_search_stack.append(_n)
+        previous_ring = [r for r in ring if r in results and results[r] > 0]
 
-    #     search_stack = new_search_stack
-
-    #return tile.neighbors
-    tiles = get_peripheral(screen, move, tile, all_tiles) 
-    return tiles
+    return results.keys()
 
 
-def calc_moves(move_limit, path=None, tile1=None, tile2=None):
-    moves = 0
-    if path is None:
-        path = calc_route2(tile1, tile2)
-    for _tile in path:
-        moves += _tile.move_consumption
-        #if moves <= move_limit:
-        _tile.tag = "path"
-    return moves
+# def calc_moves(move_limit, path=None, tile1=None, tile2=None):
+#     moves = 0
+#     if path is None:
+#         path = calc_route2(tile1, tile2)
+#     for _tile in path:
+#         moves += _tile.move_consumption
+#         #if moves <= move_limit:
+#         _tile.tag = "path"
+#     return moves
 

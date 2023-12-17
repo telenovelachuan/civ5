@@ -1,4 +1,5 @@
 from . import Objects
+from . import Graphics
 from math import sqrt
 import random
 
@@ -13,7 +14,7 @@ CIVILIZATIONS = ["French", "English", "Chinese", "Mongolian", "Babylonian", "Kor
                  "Polynesian", "Venetian", "Zulu"]
 
 def init_tiles(screen_size_x, screen_size_y):
-    first_pos = (tile_perpd, tile_radius)
+    first_pos = (Graphics.MENU_WIDTH + tile_perpd, tile_radius)
     first_tile = Objects.Tile(first_pos)
     results = {first_pos: first_tile}
     new_tiles_to_expand = {first_pos: first_tile}
@@ -22,7 +23,7 @@ def init_tiles(screen_size_x, screen_size_y):
         for _new_pos, _new_tile in new_tiles_to_expand.items():
             # search left
             left_x, left_y = round(_new_pos[0] - tile_perpd * 2, 2), _new_pos[1]
-            if left_x > 0:
+            if left_x > Graphics.MENU_WIDTH:
                 created_tile = Objects.Tile((left_x, left_y))
                 if (left_x, left_y) not in results: # add
                     updated_new_tiles[(left_x, left_y)] = created_tile
@@ -46,7 +47,7 @@ def init_tiles(screen_size_x, screen_size_y):
 
             # search left up
             left_up_x, left_up_y = round(_new_pos[0] - tile_perpd, 2), round(_new_pos[1] - 1.5 * tile_radius, 2)
-            if left_up_x > 0 and left_up_y > 0:
+            if left_up_x > Graphics.MENU_WIDTH and left_up_y > 0:
                 created_tile = Objects.Tile((left_up_x, left_up_y))
                 if (left_up_x, left_up_y) not in results:
                     updated_new_tiles[(left_up_x, left_up_y)] = created_tile
@@ -57,7 +58,7 @@ def init_tiles(screen_size_x, screen_size_y):
             
             # search left down
             left_down_x, left_down_y = round(_new_pos[0] - tile_perpd, 2), round(_new_pos[1] + 1.5 * tile_radius, 2)
-            if left_down_x > 0 and left_down_y < screen_size_y:
+            if left_down_x > Graphics.MENU_WIDTH and left_down_y < screen_size_y:
                 created_tile = Objects.Tile((left_down_x, left_down_y))
                 if (left_down_x, left_down_y) not in results:
                     updated_new_tiles[(left_down_x, left_down_y)] = created_tile
@@ -102,16 +103,19 @@ def init_tiles(screen_size_x, screen_size_y):
 def assign_seq(all_tiles):
     num_assigned = 0
     _row_start = all_tiles[0]
+    _row_seq = 0
     while num_assigned < len(all_tiles):
         _row_cur = _row_start
+        _cell_seq = 0 if _row_seq % 2 == 0 else 0.5
         while _row_cur is not None:
-            _row_cur.seq = str(num_assigned)
+            _row_cur.seq = f"{_row_seq}^{_cell_seq}" #str(num_assigned)
+            _cell_seq += 1
             num_assigned += 1
             _row_cur = _row_cur.right
         _row_start = _row_start.left_down or _row_start.right_down
+        _row_seq += 1
 
 def init_terrain(tiles):
-    # randomize 2 large continents
     land_seeds = random.sample(list(tiles.values()), LAND_SEED_NUM)
     tiles_to_assign = []
     for _tile in land_seeds:

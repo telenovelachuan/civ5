@@ -73,3 +73,11 @@ class Unit():
         self.tile.unit = None
         self.tile = new_tile
         self.tile.unit = self
+
+
+class Settler(Unit):
+    def __init__(self, tile, owner, moves=2):
+        super().__init__("settler", tile, owner, moves)
+
+    def settle(self):
+        pass
