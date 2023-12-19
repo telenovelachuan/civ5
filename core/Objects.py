@@ -1,4 +1,6 @@
 import random
+import math
+import pygame
 
 TILE_RADIUS = 30
 
@@ -16,7 +18,35 @@ class Tile():
         self.unit = None
         self.tag = None
         self.seq = None
-    
+        self.owner = None
+        self.vertexes = {
+            "left_up": (round(self.pos[0] - self.radius / 2 * math.sqrt(3), 2), self.pos[1] - self.radius / 2),
+            "up": (self.pos[0], self.pos[1] - self.radius),
+            "right_up": (round(self.pos[0] + self.radius / 2 * math.sqrt(3), 2), self.pos[1] - self.radius / 2),
+            "right_down": (round(self.pos[0] + self.radius / 2 * math.sqrt(3), 2), self.pos[1] + self.radius / 2),
+            "down": (self.pos[0], self.pos[1] + self.radius),
+            "left_down": (round(self.pos[0] - self.radius / 2 * math.sqrt(3), 2), self.pos[1] + self.radius / 2),
+        }
+
+        # self.edges = {
+        #     self.left_up: [self.vertexes["left_up"], self.vertexes["up"]],
+        #     self.right_up: [self.vertexes["up"], self.vertexes["right_up"]],
+        #     self.right: [self.vertexes["right_up"], self.vertexes["right_down"]],
+        #     self.right_down: [self.vertexes["right_down"], self.vertexes["down"]],
+        #     self.left_down: [self.vertexes["down"], self.vertexes["left_down"]],
+        #     self.left: [self.vertexes["left_down"], self.vertexes["left_up"]]
+        # }
+
+    @property
+    def edges(self):
+        return {
+            self.left_up: [self.vertexes["left_up"], self.vertexes["up"]],
+            self.right_up: [self.vertexes["up"], self.vertexes["right_up"]],
+            self.right: [self.vertexes["right_up"], self.vertexes["right_down"]],
+            self.right_down: [self.vertexes["right_down"], self.vertexes["down"]],
+            self.left_down: [self.vertexes["down"], self.vertexes["left_down"]],
+            self.left: [self.vertexes["left_down"], self.vertexes["left_up"]]
+        }
     
     @property
     def neighbors(self):
@@ -51,12 +81,49 @@ class Tile():
 class Civilization():
     def __init__(self, civ_name, all_tiles):
         self.name = civ_name
-        self.units = []
+        
         # init settler
         valid_tiles = [t for t in all_tiles.values() if t.terrain not in ["ocean", "mountain"] and t.unit is None]
         settler_tile = random.choice(valid_tiles)
-        settler = Unit("settler", settler_tile, self)
+        settler = Settler(settler_tile, self)
+        self.units = [settler]
         settler_tile.unit = settler
+        self.capital = None
+        self.cities = []
+        self.border_tiles = []
+        self.borders = []
+        self.color = pygame.Color(random.randrange(0,256), random.randrange(0,256), random.randrange(0,256), 255)
+    
+    @property
+    def tiles(self):
+        results = {}
+        for city in self.cities:
+            for _tile in city.tiles:
+                if _tile.seq not in results:
+                    results[_tile.seq] = _tile
+        return results
+    
+    def update_border_tiles(self, new_city_borders):
+        self.border_tiles.extend(new_city_borders)
+        valid_borders = []
+        self_tiles = self.tiles
+        for _border_tile in self.border_tiles:
+            for _n in _border_tile.neighbors:
+                if _n not in self_tiles:
+                    valid_borders.append(_border_tile) # remove it from borders
+                    break
+        self.border_tiles = valid_borders
+    
+    def update_borders(self):
+        borders = []
+        self_tiles = self.tiles
+        for _border_tile in self.border_tiles:
+            for _n in _border_tile.neighbors:
+                if _n.seq not in self_tiles:
+                    #import pdb; pdb.set_trace()
+                    borders.append(_border_tile.edges[_n])
+        self.borders = borders
+
 
 
 class Unit():
@@ -67,17 +134,44 @@ class Unit():
         self.pos = self.tile.pos
         self.selected = False
         self.moves = moves
+        self.actions = ["do_nothing", "sleep"]
 
     def move_to(self, new_tile):
         self.pos = new_tile.pos
         self.tile.unit = None
         self.tile = new_tile
         self.tile.unit = self
+        self.moves -= new_tile.move_consumption
+
+    def __repr__(self) -> str:
+        return f"{self.owner.name} {self.type}"
 
 
 class Settler(Unit):
     def __init__(self, tile, owner, moves=2):
         super().__init__("settler", tile, owner, moves)
+        self.actions = ["settle"] + self.actions
 
     def settle(self):
-        pass
+        print(f"{self} settle called")
+        capital = City(self.tile, self.owner)
+        self.owner.capital = capital
+
+
+class City():
+    def __init__(self, tile, owner, start_population=1):
+        self.owner = owner
+        self.owner.cities.append(self)
+        self.tile = tile
+        self.population = start_population
+        self.tiles = [tile] + tile.neighbors
+        self.borders = tile.neighbors
+        for _tile in self.tiles:
+            _tile.owner = owner
+
+        # update civ border tiles
+        self.owner.update_border_tiles(self.borders)
+        self.owner.update_borders()
+
+
+    

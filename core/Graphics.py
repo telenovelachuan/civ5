@@ -11,17 +11,28 @@ TERRAIN_TILE_COLOR = {
     "jungle": pygame.Color(82, 96, 74, 255),
     "mountain": pygame.Color(68, 60, 47, 255),
 }
-FOOD_IMG = pygame.transform.scale(pygame.image.load('image/food.webp'), (10, 10))
+IMG_DICT = {
+    "food": pygame.transform.scale(pygame.image.load('image/food.webp'), (10, 10)),
+    "do_nothing": pygame.transform.scale(pygame.image.load('image/do_nothing.png'), (30, 30)),
+    "sleep": pygame.transform.scale(pygame.image.load('image/sleep.png'), (30, 30)),
+    "settle": pygame.transform.scale(pygame.image.load('image/settle.png'), (30, 30))
+}
+
 FONT = pygame.font.SysFont(None, 15)
 MENU_BORDER_COLOR = pygame.Color(180, 182, 158, 255)
 SCREEN_X = 1280
 SCREEN_Y = 720
 MENU_WIDTH = 100
+MENU_START_Y = SCREEN_Y - 300
 TECH_CIRCLE_RADIUS = 45
 
 def init_screen():
     screen = pygame.display.set_mode((SCREEN_X, SCREEN_Y))
     return screen
+
+def init_game_canvas(screen):
+    pygame.draw.rect(screen, TERRAIN_TILE_COLOR["ocean"],
+                     [MENU_WIDTH, 0, SCREEN_X - MENU_WIDTH, SCREEN_Y], width=0)
 
 def draw_text(screen, text, pos):
     text = FONT.render(text, True, "black")
@@ -53,9 +64,9 @@ def draw_hexagons(screen, all_tiles):
         hex_obj[_seq] = _hex
     return hex_obj
 
-def tile_hover(screen, tile):
-    x, y = tile.pos
-    screen.blit(FOOD_IMG, (x - tile.radius / 2, y))
+# def tile_hover(screen, tile):
+#     x, y = tile.pos
+#     screen.blit(FOOD_IMG, (x - tile.radius / 2, y))
 
 def draw_units(screen, all_tiles):
     circles = {}
@@ -71,8 +82,34 @@ def draw_units(screen, all_tiles):
 
 def draw_menu_bar(screen):
     screen_x, screen_y = screen.get_size()
-    pygame.draw.rect(screen, "white", pygame.Rect(0, 0, MENU_WIDTH, screen_y), width=0)
-    pygame.draw.rect(screen, MENU_BORDER_COLOR, pygame.Rect(0,0, MENU_WIDTH, screen_y), width=3)
-
+    pygame.draw.rect(screen, "white", pygame.Rect(0, 0, MENU_WIDTH - 1, screen_y), width=0)
+    pygame.draw.rect(screen, MENU_BORDER_COLOR, [0,0, MENU_WIDTH - 1, screen_y], width=3)
     pygame.draw.circle(screen, MENU_BORDER_COLOR, (50, 50), radius=TECH_CIRCLE_RADIUS, width=1)
 
+
+def update_unit_actions_n_avatar(screen, unit_circles):
+    # clear out previous draws
+    pygame.draw.rect(screen, "white", [0, MENU_START_Y, 50, 150], width=0)
+    for _unit in unit_circles.keys():
+        if _unit.selected:
+            return draw_action_box(screen, _unit)
+    return None
+
+
+def draw_action_box(screen, selected_unit):
+    # screen_x, screen_y = screen.get_size()
+    pygame.draw.rect(screen, "black", [0, MENU_START_Y, 50, 150], width=0)
+    actions = selected_unit.actions
+    results = {}
+    for idx, _action in enumerate(actions):
+        _img = IMG_DICT[_action]
+        _button = screen.blit(_img, (10, MENU_START_Y + (10 + 30) * idx))
+        results[_action] = _button
+
+    return results
+
+def draw_borders(screen, all_civs):
+    for civ in all_civs:
+        _borders = civ.borders
+        for _border in _borders:
+            pygame.draw.line(screen, civ.color, _border[0], _border[1], width=3)

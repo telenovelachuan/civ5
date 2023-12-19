@@ -162,6 +162,7 @@ def init_civilizations(num_of_civs, all_tiles):
     all_civs = [player_civ]
     for civ_name in civs:
         all_civs.append(Objects.Civilization(civ_name, all_tiles))
+    return all_civs
 
 def get_selected_unit(unit_circles):
     for _unit, _circle in unit_circles.items():
