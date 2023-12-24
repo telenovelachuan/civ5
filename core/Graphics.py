@@ -34,8 +34,8 @@ def init_game_canvas(screen):
     pygame.draw.rect(screen, TERRAIN_TILE_COLOR["ocean"],
                      [MENU_WIDTH, 0, SCREEN_X - MENU_WIDTH, SCREEN_Y], width=0)
 
-def draw_text(screen, text, pos):
-    text = FONT.render(text, True, "black")
+def draw_text(screen, text, pos, color="black"):
+    text = FONT.render(text, True, color)
     screen.blit(text, pos)
 
 def draw_regular_hexagon(screen, tile, color):
@@ -113,3 +113,21 @@ def draw_borders(screen, all_civs):
         _borders = civ.borders
         for _border in _borders:
             pygame.draw.line(screen, civ.color, _border[0], _border[1], width=3)
+
+def draw_city_banner(screen, city):
+    city_pos = city.tile.pos
+    width = city.tile.radius * 4
+    height = city.tile.radius * 0.8
+    pos = (city_pos[0] - width / 2, city_pos[1] - city.tile.radius * 1 - height)
+    banner = pygame.draw.rect(screen, city.owner.color,
+                              pygame.Rect(pos[0], pos[1], width, height), border_radius=15, width=0)
+    draw_text(screen, city.name, (pos[0] + width / 2 - len(city.name) * 2.5, pos[1] + height * 0.3), color="white")
+    return banner
+
+def draw_all_cities(screen, all_civs):
+    banners = []
+    for civ in all_civs:
+        for city in civ.cities:
+            _banner = draw_city_banner(screen, city)
+            banners.append(_banner)
+    return banners

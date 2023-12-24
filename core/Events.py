@@ -23,6 +23,7 @@ def handle_events(screen, unit_circles, all_tiles, all_hexes, action_btns):
                             getattr(selected_unit, _action)()
                             return True
 
+                selected_unit = None
                 for _unit, _circle in unit_circles.items():
                     if _circle.collidepoint(pygame.mouse.get_pos()):
                         print(f"{_unit.owner.name} {_unit.type} clicked")

@@ -19,6 +19,7 @@ class Tile():
         self.tag = None
         self.seq = None
         self.owner = None
+        self.city = None
         self.vertexes = {
             "left_up": (round(self.pos[0] - self.radius / 2 * math.sqrt(3), 2), self.pos[1] - self.radius / 2),
             "up": (self.pos[0], self.pos[1] - self.radius),
@@ -85,7 +86,7 @@ class Civilization():
         # init settler
         valid_tiles = [t for t in all_tiles.values() if t.terrain not in ["ocean", "mountain"] and t.unit is None]
         settler_tile = random.choice(valid_tiles)
-        settler = Settler(settler_tile, self)
+        settler = Settler(settler_tile, self, first_settler=True)
         self.units = [settler]
         settler_tile.unit = settler
         self.capital = None
@@ -124,6 +125,11 @@ class Civilization():
                     borders.append(_border_tile.edges[_n])
         self.borders = borders
 
+    def remove_unit(self, unit):
+        unit.tile.unit = None
+        self.units.remove(unit)
+        del unit
+
 
 
 class Unit():
@@ -148,22 +154,28 @@ class Unit():
 
 
 class Settler(Unit):
-    def __init__(self, tile, owner, moves=2):
+    def __init__(self, tile, owner, moves=2, first_settler=False):
         super().__init__("settler", tile, owner, moves)
         self.actions = ["settle"] + self.actions
+        self.is_capital = False
+        if first_settler == True:
+            self.is_capital = True
 
     def settle(self):
         print(f"{self} settle called")
-        capital = City(self.tile, self.owner)
+        capital = City(self.tile, "CAPITAL", self.owner, is_capital=self.is_capital)
         self.owner.capital = capital
-
+        # remove unit
+        self.owner.remove_unit(self)
 
 class City():
-    def __init__(self, tile, owner, start_population=1):
+    def __init__(self, tile, name, owner, start_population=1, is_capital=False):
+        self.name = name
         self.owner = owner
         self.owner.cities.append(self)
         self.tile = tile
         self.population = start_population
+        self.is_capital = is_capital
         self.tiles = [tile] + tile.neighbors
         self.borders = tile.neighbors
         for _tile in self.tiles:
