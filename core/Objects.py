@@ -94,7 +94,7 @@ class Civilization():
         self.border_tiles = []
         self.borders = []
         self.color = pygame.Color(random.randrange(0,256), random.randrange(0,256), random.randrange(0,256), 255)
-    
+        
     @property
     def tiles(self):
         results = {}
@@ -167,6 +167,8 @@ class Settler(Unit):
         self.owner.capital = capital
         # remove unit
         self.owner.remove_unit(self)
+        consumed = True
+        return consumed
 
 class City():
     def __init__(self, tile, name, owner, start_population=1, is_capital=False):
@@ -185,5 +187,19 @@ class City():
         self.owner.update_border_tiles(self.borders)
         self.owner.update_borders()
 
+class Tech():
+    def __init__(self, name, cost, unblock_bld=[]):
+        self.name = name
+        self.cost = cost
+        self.leads_to = []
+        self.dependencies = []
+        self.unblock_bld = unblock_bld
+
+class Building():
+    def __init__(self, name, cost, maintenance, required_tech):
+        self.name = name
+        self.cost = cost
+        self.maintenance = maintenance
+        self.required_tech = required_tech
 
     

@@ -1,17 +1,19 @@
 from . import Objects
 from . import Graphics
 from math import sqrt
-import random
+import random, json
 
 LAND_SEED_NUM = 2
-
-tile_radius = Objects.TILE_RADIUS
-tile_perpd = round(Objects.TILE_RADIUS / 2 * sqrt(3), 2)
 CIVILIZATIONS = ["French", "English", "Chinese", "Mongolian", "Babylonian", "Korean", "Spanish", "Portuguese", "German", "Byzantine", 
                  "American", "Dutch", "Swedish", "Siamese", "Indonesian", "Shoshone", "Mayan", "Brazilian", "Incan", "Celtic",
                  "Ottoman", "Egyptian", "Songhai", "Carthaginian", "Roman", "Russian", "Japanese", "Indian", "Assyrian", "Moroccan",
                  "Arabian", "Austrian", "Aztec", "Danish", "Ethiopian", "Greek", "Hunnic", "Iroquois", "Persian", "Polish",
                  "Polynesian", "Venetian", "Zulu"]
+tile_radius = Objects.TILE_RADIUS
+tile_perpd = round(Objects.TILE_RADIUS / 2 * sqrt(3), 2)
+game_status = {
+    "current_tech": ["Agriculture", 10, 10]
+}
 
 def init_tiles(screen_size_x, screen_size_y):
     first_pos = (Graphics.MENU_WIDTH + tile_perpd, tile_radius)
@@ -170,3 +172,16 @@ def get_selected_unit(unit_circles):
             return _unit
     return None
 
+def init_tech_tree():
+    results = {}
+    with open("configs/tech_tree.json", "r") as f: 
+        tech_config = json.load(f)
+    for _entry in tech_config:
+        tech = Objects.Tech(_entry["name"], _entry["cost"])
+        tech.unblock_bld = _entry.get("unblock_bld", [])
+        results[tech.name.lower()] = tech
+    for _entry in tech_config:
+        tech = results[_entry["name"].lower()]
+        for d in _entry["dependencies"]:
+            tech.dependencies.append(results[d.lower()])
+    return results

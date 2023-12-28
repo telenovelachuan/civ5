@@ -1,4 +1,5 @@
 import math
+import json
 from . import Objects
 
 DIR_OPPOSITES = {
@@ -198,13 +199,18 @@ def get_accessible_tiles(screen, all_tiles, tile, move):
     return results.keys()
 
 
-# def calc_moves(move_limit, path=None, tile1=None, tile2=None):
-#     moves = 0
-#     if path is None:
-#         path = calc_route2(tile1, tile2)
-#     for _tile in path:
-#         moves += _tile.move_consumption
-#         #if moves <= move_limit:
-#         _tile.tag = "path"
-#     return moves
+def init_tech_tree():
+    results = {}
+    with open("configs/tech_tree.json", "r") as f: 
+        tech_config = json.load(f)
+    for _entry in tech_config:
+        tech = Objects.Tech(_entry["name"], _entry["cost"])
+        tech.unblock_bld = _entry.get("unblock_bld", [])
+        results[tech.name] = tech
+    for _entry in tech_config:
+        tech = results[_entry["name"]]
+        for d in _entry["dependencies"]:
+            tech.dependencies.append(results[d])
+    import pdb; pdb.set_trace()
+    return results
 

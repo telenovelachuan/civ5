@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Agriculture",
+        "cost": 0,
+        "dependencies": []
+    },
+    {
+        "name": "Pottery",
+        "cost": 35,
+        "dependencies": ["Agriculture"]
+    }
+]

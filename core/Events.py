@@ -20,7 +20,9 @@ def handle_events(screen, unit_circles, all_tiles, all_hexes, action_btns):
                     for _action, _btn in action_btns.items():
                         if _btn.collidepoint(pygame.mouse.get_pos()):
                             print(f" {_action} clicked for {selected_unit}")
-                            getattr(selected_unit, _action)()
+                            consumed = getattr(selected_unit, _action)()
+                            if consumed == True:
+                                selected_unit = None
                             return True
 
                 selected_unit = None
