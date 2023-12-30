@@ -80,9 +80,9 @@ class Tile():
 
 
 class Civilization():
-    def __init__(self, civ_name, all_tiles):
+    def __init__(self, civ_name, civ_genitive, city_names, all_tiles):
         self.name = civ_name
-        
+        self.genitive = civ_genitive
         # init settler
         valid_tiles = [t for t in all_tiles.values() if t.terrain not in ["ocean", "mountain"] and t.unit is None]
         settler_tile = random.choice(valid_tiles)
@@ -94,7 +94,9 @@ class Civilization():
         self.border_tiles = []
         self.borders = []
         self.color = pygame.Color(random.randrange(0,256), random.randrange(0,256), random.randrange(0,256), 255)
-        
+        self.next_city_seq = 0
+        self.city_names = city_names
+
     @property
     def tiles(self):
         results = {}
@@ -150,7 +152,7 @@ class Unit():
         self.moves -= new_tile.move_consumption
 
     def __repr__(self) -> str:
-        return f"{self.owner.name} {self.type}"
+        return f"{self.owner.genitive} {self.type}"
 
 
 class Settler(Unit):
@@ -163,8 +165,9 @@ class Settler(Unit):
 
     def settle(self):
         print(f"{self} settle called")
-        capital = City(self.tile, "CAPITAL", self.owner, is_capital=self.is_capital)
-        self.owner.capital = capital
+        city_name = self.owner.city_names[self.owner.next_city_seq].upper()
+        _city = City(self.tile, city_name, self.owner, is_capital=self.is_capital)
+
         # remove unit
         self.owner.remove_unit(self)
         consumed = True
@@ -175,9 +178,12 @@ class City():
         self.name = name
         self.owner = owner
         self.owner.cities.append(self)
+        self.owner.next_city_seq += 1
         self.tile = tile
         self.population = start_population
         self.is_capital = is_capital
+        if is_capital == True:
+            self.owner.capital = self
         self.tiles = [tile] + tile.neighbors
         self.borders = tile.neighbors
         for _tile in self.tiles:
@@ -206,13 +212,13 @@ class Tech():
     @property
     def status(self):
         if self.completed >= self.cost:
-            return "done"
+            return "researched"
         if self.in_progress == True:
             return "researching"
         for _tech in self.dependencies:
-            if _tech.status != "done":
+            if _tech.status != "researched":
                 return "unresearchable"
-        return "ready"
+        return "available"
 
 class Building():
     def __init__(self, name, cost, maintenance, required_tech):

@@ -4,11 +4,9 @@ from math import sqrt
 import random, json, os, pygame
 
 LAND_SEED_NUM = 2
-CIVILIZATIONS = ["French", "English", "Chinese", "Mongolian", "Babylonian", "Korean", "Spanish", "Portuguese", "German", "Byzantine", 
-                 "American", "Dutch", "Swedish", "Siamese", "Indonesian", "Shoshone", "Mayan", "Brazilian", "Incan", "Celtic",
-                 "Ottoman", "Egyptian", "Songhai", "Carthaginian", "Roman", "Russian", "Japanese", "Indian", "Assyrian", "Moroccan",
-                 "Arabian", "Austrian", "Aztec", "Danish", "Ethiopian", "Greek", "Hunnic", "Iroquois", "Persian", "Polish",
-                 "Polynesian", "Venetian", "Zulu"]
+with open("configs/civs.json", "r") as f: 
+    CIVILIZATIONS = json.load(f)
+
 tile_radius = Objects.TILE_RADIUS
 tile_perpd = round(Objects.TILE_RADIUS / 2 * sqrt(3), 2)
 
@@ -184,13 +182,13 @@ def init_terrain(tiles):
     return tiles
 
 def init_civilizations(num_of_civs, all_tiles):
-    player_civ_name = random.choice(CIVILIZATIONS)
-    player_civ = Objects.Civilization(player_civ_name, all_tiles)
+    player_civ_name, civ_json = random.choice(list(CIVILIZATIONS.items()))
+    player_civ = Objects.Civilization(player_civ_name, civ_json["genitive"], civ_json["cities"], all_tiles)
 
-    civs = random.sample(CIVILIZATIONS, num_of_civs)
+    civs = random.sample(list(CIVILIZATIONS.items()), num_of_civs)
     all_civs = [player_civ]
-    for civ_name in civs:
-        all_civs.append(Objects.Civilization(civ_name, all_tiles))
+    for _civ_name, _civ_json in civs:
+        all_civs.append(Objects.Civilization(_civ_name, _civ_json["genitive"], civ_json["cities"], all_tiles))
     return all_civs
 
 def get_selected_unit(unit_circles):

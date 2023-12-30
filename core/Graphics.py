@@ -27,12 +27,18 @@ MENU_START_Y = SCREEN_Y - 300
 TECH_CIRCLE_RADIUS = 45
 TECH_CIRCLE_INTERNAL_RADIUS = TECH_CIRCLE_RADIUS * 0.95
 CITY_BANNER_TRANSPARANCY = 1.5
-TECH_BG_COLOR = pygame.Color(16, 42, 37, 255)
+BUTTON_COLOR = pygame.Color(20, 46, 42, 255)
+TECH_CIRCLE_BG_COLOR = pygame.Color(16, 42, 37, 255)
 TECH_FONT_COLOR = pygame.Color(214, 216, 175, 255)
-TECH_COMPLETED_COLOR = pygame.Color(179, 145, 57, 255)
 TECH_TREE_BG_COLOR = pygame.Color(2, 2, 2, 255)
+TECH_RESEARCHED_COLOR = pygame.Color(179, 145, 57, 255)
 TECH_BAR_HEIGHT = 30
-
+TECH_FRAME_BG_COLORS = {
+    "researched": TECH_RESEARCHED_COLOR,
+    "researching": pygame.Color(49, 87, 80, 255),
+    "available": pygame.Color(77, 130, 36, 255),
+    "unresearchable": TECH_TREE_BG_COLOR
+}
 
 def init_screen():
     screen = pygame.display.set_mode((SCREEN_X, SCREEN_Y))
@@ -139,30 +145,32 @@ def draw_city_banner(screen, city):
     height = city.tile.radius * 0.8
     pos = (city_pos[0] - width / 2, city_pos[1] - city.tile.radius * 1 - height)
     banner_color = lighten_color(city.owner.color)
-    banner = pygame.draw.rect(screen, banner_color, [pos[0], pos[1], width, height], border_radius=15, width=0)
-    pygame.draw.rect(screen, "black", [pos[0], pos[1], width, height], border_radius=15, width=1)
-    draw_text(screen, city.name, (pos[0] + width / 2 - len(city.name) * 2.5, pos[1] + height * 0.3), color=city.owner.color)
-    draw_text(screen, city.population, (pos[0] + width * 0.1, pos[1] + height * 0.3), color=city.owner.color)
-    pygame.draw.line(screen, "black", (pos[0] + width * 0.2, pos[1]), (pos[0] + width * 0.2, pos[1] + height - 1), width=2)
-    pygame.draw.line(screen, "black", (pos[0] + width * 0.8, pos[1]), (pos[0] + width * 0.8, pos[1] + height - 1), width=2)
+    pygame.draw.rect(screen, MENU_BORDER_COLOR, [pos[0], pos[1], width, height], border_radius=15, width=0)
+    banner = pygame.draw.rect(screen, banner_color, [pos[0]+2, pos[1]+2, width-4, height-4], border_radius=15, width=0)
+    #pygame.draw.rect(screen, banner_color, [pos[0], pos[1], width, height], border_radius=15, width=0)
+    
+    draw_text(screen, city.name, (pos[0] + width / 2 - len(city.name) * 2.5, pos[1] + height * 0.22), color=city.owner.color)
+    draw_text(screen, city.population, (pos[0] + width * 0.1, pos[1] + height * 0.22), color=city.owner.color)
+    pygame.draw.line(screen, "black", (pos[0] + width * 0.2, pos[1] + 2), (pos[0] + width * 0.2, pos[1] + height - 3), width=2)
+    pygame.draw.line(screen, "black", (pos[0] + width * 0.8, pos[1] + 2), (pos[0] + width * 0.8, pos[1] + height - 3), width=2)
     return banner
 
 def draw_all_cities(screen, all_civs):
-    banners = []
+    banners = {}
     for civ in all_civs:
         for city in civ.cities:
             _banner = draw_city_banner(screen, city)
-            banners.append(_banner)
+            banners[city] = _banner
     return banners
 
 def draw_tech_circle(screen, current_tech):
-    pygame.draw.rect(screen, TECH_BG_COLOR, [0, 0, MENU_WIDTH - 1, TECH_BAR_HEIGHT], border_radius=5, width=0)
+    pygame.draw.rect(screen, TECH_CIRCLE_BG_COLOR, [0, 0, MENU_WIDTH - 1, TECH_BAR_HEIGHT], border_radius=5, width=0)
     pygame.draw.rect(screen, MENU_BORDER_COLOR, [0, 0, MENU_WIDTH - 1, TECH_BAR_HEIGHT], border_radius=5, width=1)
     tech_name = current_tech.name.upper()
     draw_text(screen, tech_name, (MENU_WIDTH * 0.1, TECH_BAR_HEIGHT * 0.3), color=TECH_FONT_COLOR)
     # draw tech progress
-    if current_tech.status == "done":
-        pygame.draw.circle(screen, TECH_COMPLETED_COLOR, (50, 50 + TECH_BAR_HEIGHT), radius=TECH_CIRCLE_RADIUS, width=0)
+    if current_tech.status == "researched":
+        pygame.draw.circle(screen, TECH_RESEARCHED_COLOR, (50, 50 + TECH_BAR_HEIGHT), radius=TECH_CIRCLE_RADIUS, width=0)
     
     # draw tech circles
     pygame.draw.circle(screen, MENU_BORDER_COLOR, (50, 50 + TECH_BAR_HEIGHT), radius=TECH_CIRCLE_RADIUS, width=3)
@@ -174,7 +182,7 @@ def draw_tech_circle(screen, current_tech):
 def draw_tech_tree(screen, all_techs):
     tech_frames = {}
     pygame.draw.rect(screen, TECH_TREE_BG_COLOR, [MENU_WIDTH, 0, SCREEN_X - MENU_WIDTH, SCREEN_Y], width=0)
-    valid_techs = [t for _, t in all_techs.items() if t.status in ("ready", "researching")]
+    valid_techs = [t for _, t in all_techs.items() if t.status in ("available", "researching")]
     start_stage = min([t.stage for t in valid_techs]) - 1
     end_stage = min([t.stage for t in valid_techs]) + 1
     techs_to_draw = [t for _, t in all_techs.items() if t.stage >= start_stage and t.stage <= end_stage]
@@ -189,12 +197,13 @@ def draw_tech_tree(screen, all_techs):
             _tech = stage_techs[_stage_seq]
             stage_tech_height = SCREEN_Y / num_stage_techs
             stage_tech_y_start = _stage_seq * stage_tech_height
-            #pygame.draw.rect(screen, "white", [stage_x_start, stage_tech_y_start, stage_width, stage_tech_height], width=2)
             # draw tech frame
             tech_frame_width = stage_width * 0.6
             tech_frame_height = 50
             tech_frame_x = stage_x_start + stage_width / 2 - tech_frame_width / 2
             tech_frame_y = stage_tech_y_start + stage_tech_height / 2 - tech_frame_height / 2
+            frame_bg_color = TECH_FRAME_BG_COLORS[_tech.status]
+            pygame.draw.rect(screen, frame_bg_color, [tech_frame_x, tech_frame_y, tech_frame_width, tech_frame_height], border_radius=7, width=0)
             pygame.draw.rect(screen, MENU_BORDER_COLOR, [tech_frame_x, tech_frame_y, tech_frame_width, tech_frame_height], border_radius=7, width=2)
             # draw tech frame contents
             draw_tech_frame(screen, tech_frame_x, tech_frame_y, tech_frame_width, tech_frame_height, _tech)
@@ -211,7 +220,13 @@ def draw_tech_tree(screen, all_techs):
             start_point_y = _dep_frame[1] + _dep_frame[3] / 2
             pygame.draw.line(screen, MENU_BORDER_COLOR, (start_point_x, start_point_y), (end_point_x, end_point_y), width=3)
 
-
+    # back button
+    button_width = SCREEN_X * 0.07
+    button_height = SCREEN_Y * 0.05
+    pygame.draw.rect(screen, BUTTON_COLOR, [MENU_WIDTH + SCREEN_X * 0.01, SCREEN_Y - button_height, button_width, button_height], border_radius=7, width=0)
+    button_return = pygame.draw.rect(screen, MENU_BORDER_COLOR, [MENU_WIDTH + SCREEN_X * 0.01, SCREEN_Y - button_height, button_width, button_height], border_radius=7, width=2)
+    draw_text(screen, "BACK", (MENU_WIDTH + SCREEN_X * 0.01 + button_width * 0.28, SCREEN_Y - button_height + button_height * 0.2), MENU_BORDER_COLOR, bold=False, size=15)
+    return button_return
 
 def draw_tech_frame(screen, frame_x, frame_y, frame_width, frame_height, tech):
     # tech circle
@@ -232,3 +247,5 @@ def draw_tech_frame(screen, frame_x, frame_y, frame_width, frame_height, tech):
         icon_x = frame_x + frame_width * 0.25 + idx * frame_width * 0.12
         screen.blit(icon_img, (icon_x, frame_y + frame_height * 0.4))
     
+def draw_city(screen):
+    pygame.draw.rect(screen, "black", [MENU_WIDTH, 0, SCREEN_X - MENU_WIDTH, SCREEN_Y], width=0)

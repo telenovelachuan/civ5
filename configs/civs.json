@@ -1,0 +1,170 @@
+{
+    "France": {
+        "genitive": "French",
+        "cities": ["Paris", "Orleans", "Lyon", "Troyes", "Tours"]
+    },
+    "England": {
+        "genitive": "English",
+        "cities": ["London", "York", "Nottingham", "Hastings", "Canterbury"]
+    },
+    "China": {
+        "genitive": "Chinese",
+        "cities": ["Beijing", "Shanghai", "Guangzhou", "Nanjing", "Xian"]
+    },
+    "Mongolia": {
+        "genitive": "Mongolian",
+        "cities": ["Karakorum", "Beshbalik", "Turfan", "Hsia", "Old Sarai"]
+    },
+    "Babylon": {
+        "genitive": "Babylonian",
+        "cities": ["Babylon", "Akkad", "Dur-Kurigalzu", "Nippur", "Borsippa"]
+    },
+    "Korea": {
+        "genitive": "Korean",
+        "cities": ["Seoul", "Busan", "Jeonju", "Daegu", "Pyongyang"]
+    },
+    "Spain": {
+        "genitive": "Spanish",
+        "cities": ["Madrid", "Barcelona", "Seville", "Cordoba", "Toledo"]
+    },
+    "Portugal": {
+        "genitive": "Portuguese",
+        "cities": ["Lisbon", "Porto", "Braga", "Coimbra", "Funchal"]
+    },
+    "Germany": {
+        "genitive": "German",
+        "cities": ["Berlin", "Hamburg", "Munich", "Cologne", "Frankfurt"]
+    },
+    "Byzantine": {
+        "genitive": "Byzantine",
+        "cities": ["Constantinople", "Adrianople", "Nicaea", "Antioch", "Varna"]
+    },
+    "America": {
+        "genitive": "American",
+        "cities": ["Washington", "New York", "Boston", "Philadelphia", "Atlanta"]
+    },
+    "Netherland": {
+        "genitive": "Dutch",
+        "cities": ["Amsterdam", "Rotterdam", "Utrecht", "Groningen", "Breda"]
+    },
+    "Sweden": {
+        "genitive": "Swedish",
+        "cities": ["Stockholm", "Sigtuna", "Helsinki", "Birka", "Uppsala"]
+    },
+    "Siam": {
+        "genitive": "Siamese",
+        "cities": ["Sukhothai", "Si Satchanalai", "Muang Saluang", "Lampang", "Phitsanulok"]
+    },
+    "Indonesia": {
+        "genitive": "Indonesian",
+        "cities": ["Jakarta", "Surabaya", "Medan", "Makassar", "Batam"]
+    },
+    "Shoshone": {
+        "genitive": "Shoshone",
+        "cities": ["Moson Kahni", "Te-Moak", "Agaidika", "Goshute", "Pohokwi"]
+    },
+    "Maya": {
+        "genitive": "Mayan",
+        "cities": ["Palenque", "Tikal", "Chichen Itza", "Uxmal", "Tulum"]
+    },
+    "Brazil": {
+        "genitive": "Brazilian",
+        "cities": ["Rio de Janeiro", "São Paulo", "Salvador", "Brasília", "Fortaleza"]
+    },
+    "Inca": {
+        "genitive": "Incan",
+        "cities": ["Cusco", "Tiwanaku", "Machu", "Ollantaytambo", "Corihuayrachina"]
+    },
+    "Celtic": {
+        "genitive": "Celtic",
+        "cities": ["Edinburgh", "Dublin", "Cardiff", "Truro", "Nantes"]
+    },
+    "Ottoman": {
+        "genitive": "Ottoman",
+        "cities": ["Istanbul", "Edirne", "Ankara", "Bursa", "Konya"]
+    },
+    "Egypt": {
+        "genitive": "Egyptian",
+        "cities": ["Thebes", "Memphis", "Heliopolis", "Elephantine", "Alexandria"]
+    },
+    "Songhai": {
+        "genitive": "Songhai",
+        "cities": ["Gao", "Tombouctu", "Jenne", "Taghaza", "Tondibi"]
+    },
+    "Carthage": {
+        "genitive": "Carthaginian",
+        "cities": ["Carthage", "Utique", "Hippo Regius", "Gades", "Saguntum"]
+    },
+    "Rome": {
+        "genitive": "Roman",
+        "cities": ["Rome", "Antium", "Cumae", "Neapolis", "Ravenna"]
+    },
+    "Russia": {
+        "genitive": "Russian",
+        "cities": ["Moscow", "St. Petersburg", "Novgorod", "Rostov", "Yaroslavl"]
+    },
+    "Japan": {
+        "genitive": "Japanese",
+        "cities": ["Kyoto", "Osaka", "Tokyo", "Satsuma", "Kagoshima"]
+    },
+    "India": {
+        "genitive": "Indian",
+        "cities": ["Delhi", "Mumbai", "Vijayanagara", "Pataliputra", "Varanasi"]
+    },
+    "Assyria": {
+        "genitive": "Assyrian",
+        "cities": ["Assur", "Nineveh", "Nimrud", "Kar-Tukulti-Ninurta", "Dur-Sharrukin"]
+    },
+    "Morocco": {
+        "genitive": "Moroccan",
+        "cities": ["Marrakech", "Rabat", "Fes", "Casablanca", "Tangier"]
+    },
+    "Arabia": {
+        "genitive": "Arabian",
+        "cities": ["Mecca", "Medina", "Damascus", "Baghdad", "Najran"]
+    },
+    "Austria": {
+        "genitive": "Austrian",
+        "cities": ["Vienna", "Salzburg", "Graz", "Linz", "Klagenfurt"]
+    },
+    "Aztec": {
+        "genitive": "Aztec",
+        "cities": ["Tenochtitlan", "Teotihuacan", "Tlatelolco", "Texcoco", "Tlaxcala"]
+    },
+    "Denmark": {
+        "genitive": "Danish",
+        "cities": ["Copenhagen", "Aarhus", "Kaupang", "Ribe", "Viborg"]
+    },
+    "Ethiopia": {
+        "genitive": "Ethiopian",
+        "cities": ["Addis Ababa", "Harar", "Adwa", "Lalibela", "Gondar"]
+    },
+    "Greece": {
+        "genitive": "Greek",
+        "cities": ["Athens", "Sparta", "Corinth", "Argos", "Knossos"]
+    },
+    "Huns": {
+        "genitive": "Hunnic",
+        "cities": ["Attila's Court", "CHEROKEE", "ANASAZI", "TEOIHUACAN", "OLMEC"]
+    },
+    "Iroquois": {
+        "genitive": "Iroquois",
+        "cities": ["Onondaga", "Osininka", "Grand River", "Akwesasme", "Buffalo Creek"]
+    },
+    "Persia": {
+        "genitive": "Persian",
+        "cities": ["Persepolis", "Pasargadae", "Susa", "Ecbatana", "Tarsus"]
+    },
+    "Poland": {
+        "genitive": "Polish",
+        "cities": ["Warsaw", "Krakow", "Lodz", "Wroclaw", "Poznan"]
+    },
+    "Polynesia": {
+        "genitive": "Polynesian",
+        "cities": ["Honolulu", "Samoa", "Tonga", "Nuku Hiva", "Raiatea"]
+    },
+    "Zulu": {
+        "genitive": "Zulu",
+        "cities": ["Ulundi", "Umgungundlovu", "Nobamba", "Bulawayo", "KwaDukuza"]
+    }
+}

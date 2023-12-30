@@ -5,8 +5,13 @@ accessible_tiles_temp = None
 dragging = False
 selected_unit = None
 
+def _handle_tech_circle_click(tech_circle):
+    if tech_circle.collidepoint(pygame.mouse.get_pos()):
+        print("tech circle clicked!!")
+        return {"running": True, "drawing_mode": "tech"}
+    return None
 
-def handle_normal_events(screen, unit_circles, all_tiles, all_hexes, action_btns, tech_circle):
+def handle_normal_events(screen, unit_circles, all_tiles, all_hexes, action_btns, tech_circle, city_banners):
     running = True
     drawing_mode = "normal"
     ev = pygame.event.get()
@@ -36,9 +41,14 @@ def handle_normal_events(screen, unit_circles, all_tiles, all_hexes, action_btns
                     else:
                         _unit.selected = False
 
-                if tech_circle.collidepoint(pygame.mouse.get_pos()):
-                    print("tech circle clicked!!")
-                    drawing_mode = "tech"
+                _tech_circle_click_return = _handle_tech_circle_click(tech_circle)
+                if _tech_circle_click_return is not None:
+                    return _tech_circle_click_return
+
+                for _city, _banner in city_banners.items():
+                    if _banner.collidepoint(pygame.mouse.get_pos()):
+                        print(f"city {_city.name} banner clicked")
+                        return {"running": True, "drawing_mode": "city", "city_banner_clicked": _city}
             
             elif event.button == 3: # right click, move
                 if selected_unit is None:
@@ -88,12 +98,30 @@ def handle_normal_events(screen, unit_circles, all_tiles, all_hexes, action_btns
     results = {"running": running, "drawing_mode": drawing_mode}
     return results
 
-def handle_tech_events():
+def handle_tech_events(btn_return):
     running = True
+    drawing_mode = "tech"
     ev = pygame.event.get()
     for event in ev:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             #import pdb; pdb.set_trace()
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1: # left click
+                if btn_return.collidepoint(pygame.mouse.get_pos()):
+                    drawing_mode = "normal"
+    return {"running": running, "drawing_mode": drawing_mode}
 
-    return {"running": running, "drawing_mode": "tech"}
+def handle_city_events(tech_circle):
+    running = True
+    drawing_mode = "city"
+    ev = pygame.event.get()
+    for event in ev:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            #import pdb; pdb.set_trace()
+            running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: # left click
+            _tech_circle_click_return = _handle_tech_circle_click(tech_circle)
+            if _tech_circle_click_return is not None:
+                return _tech_circle_click_return
+    return {"running": running, "drawing_mode": drawing_mode}
