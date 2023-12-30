@@ -2,11 +2,97 @@
     {
         "name": "Agriculture",
         "cost": 0,
-        "dependencies": []
+        "dependencies": [],
+        "stage": 0,
+        "stage_seq": 0,
+        "icons": ["farm"]
     },
     {
         "name": "Pottery",
         "cost": 35,
-        "dependencies": ["Agriculture"]
+        "dependencies": ["Agriculture"],
+        "stage": 1,
+        "stage_seq": 0,
+        "icons": ["granary", "shrine"]
+    },
+    {
+        "name": "Animal Husbandry",
+        "cost": 35,
+        "dependencies": ["Agriculture"],
+        "stage": 1,
+        "stage_seq": 1,
+        "icons": ["caravan", "horses", "pasture", "decagon^"]
+    },
+    {
+        "name": "Sailing",
+        "cost": 55,
+        "dependencies": ["Pottery"],
+        "stage": 2,
+        "stage_seq": 0,
+        "icons": ["work_boat", "trireme", "cargo_ship", "fishing_boats", "decagon^"]
+    },
+    {
+        "name": "Archery",
+        "cost": 35,
+        "dependencies": ["Agriculture"],
+        "stage": 1,
+        "stage_seq": 2,
+        "icons": ["archer", "temple_of_artemis"]
+    },
+    {
+        "name": "Mining",
+        "cost": 35,
+        "dependencies": ["Agriculture"],
+        "stage": 1,
+        "stage_seq": 3,
+        "icons": ["mine", "chopping^"]
+    },
+    {
+        "name": "Calendar",
+        "cost": 55,
+        "dependencies": ["Pottery"],
+        "stage": 2,
+        "stage_seq": 1,
+        "icons": ["stonehenge", "stone_works", "plantation"]
+    },
+    {
+        "name": "Writing",
+        "cost": 55,
+        "dependencies": ["Pottery"],
+        "stage": 2,
+        "stage_seq": 2,
+        "icons": ["library", "great_library", "decagon^"]
+    },
+    {
+        "name": "Trapping",
+        "cost": 55,
+        "dependencies": ["Animal Husbandry"],
+        "stage": 2,
+        "stage_seq": 3,
+        "icons": ["circus", "camp"]
+    },
+    {
+        "name": "The Wheel",
+        "cost": 55,
+        "dependencies": ["Animal Husbandry", "Archery"],
+        "stage": 2,
+        "stage_seq": 4,
+        "icons": ["chariot_archer", "water_mill", "road"]
+    },
+    {
+        "name": "Masonry",
+        "cost": 55,
+        "dependencies": ["Mining"],
+        "stage": 2,
+        "stage_seq": 5,
+        "icons": ["walls", "pyramids", "mausoleum_of_halicarnassus", "quarry", "clearing_marshes^"]
+    },
+    {
+        "name": "Bronze Working",
+        "cost": 55,
+        "dependencies": ["Mining"],
+        "stage": 2,
+        "stage_seq": 6,
+        "icons": ["spearman", "barracks", "statue_of_zeus", "iron", "chopping^"]
     }
 ]

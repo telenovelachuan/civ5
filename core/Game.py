@@ -1,7 +1,7 @@
 from . import Objects
 from . import Graphics
 from math import sqrt
-import random, json
+import random, json, os, pygame
 
 LAND_SEED_NUM = 2
 CIVILIZATIONS = ["French", "English", "Chinese", "Mongolian", "Babylonian", "Korean", "Spanish", "Portuguese", "German", "Byzantine", 
@@ -11,8 +11,35 @@ CIVILIZATIONS = ["French", "English", "Chinese", "Mongolian", "Babylonian", "Kor
                  "Polynesian", "Venetian", "Zulu"]
 tile_radius = Objects.TILE_RADIUS
 tile_perpd = round(Objects.TILE_RADIUS / 2 * sqrt(3), 2)
+
+# def load_tech_images():
+#     results = {}
+#     for _name in os.listdir("image/techs"):
+#         if _name.endswith(".webp"):
+#             results[_name.split(".")[0].lower()] = pygame.transform.scale(pygame.image.load(f'image/techs/{_name}'),
+#                                                         (TECH_CIRCLE_INTERNAL_RADIUS*2, TECH_CIRCLE_INTERNAL_RADIUS*2))
+#     return results
+
+def init_tech_tree():
+    results = {}
+    with open("configs/tech_tree.json", "r") as f: 
+        tech_config = json.load(f)
+    for _entry in tech_config:
+        tech = Objects.Tech(_entry["name"], _entry["cost"], _entry["icons"])
+        tech.unblock_bld = _entry.get("unblock_bld", [])
+        tech.stage = _entry["stage"]
+        tech.stage_seq = _entry["stage_seq"]
+        results[tech.name.lower()] = tech
+    for _entry in tech_config:
+        tech = results[_entry["name"].lower()]
+        for d in _entry["dependencies"]:
+            tech.dependencies.append(results[d.lower()])
+    return results
+
+all_techs = init_tech_tree()
 game_status = {
-    "current_tech": ["Agriculture", 10, 10]
+    "tech_tree": all_techs,
+    "current_tech": all_techs["agriculture"],
 }
 
 def init_tiles(screen_size_x, screen_size_y):
@@ -172,16 +199,4 @@ def get_selected_unit(unit_circles):
             return _unit
     return None
 
-def init_tech_tree():
-    results = {}
-    with open("configs/tech_tree.json", "r") as f: 
-        tech_config = json.load(f)
-    for _entry in tech_config:
-        tech = Objects.Tech(_entry["name"], _entry["cost"])
-        tech.unblock_bld = _entry.get("unblock_bld", [])
-        results[tech.name.lower()] = tech
-    for _entry in tech_config:
-        tech = results[_entry["name"].lower()]
-        for d in _entry["dependencies"]:
-            tech.dependencies.append(results[d.lower()])
-    return results
+

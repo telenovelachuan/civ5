@@ -5,8 +5,10 @@ accessible_tiles_temp = None
 dragging = False
 selected_unit = None
 
-def handle_events(screen, unit_circles, all_tiles, all_hexes, action_btns):
+
+def handle_normal_events(screen, unit_circles, all_tiles, all_hexes, action_btns, tech_circle):
     running = True
+    drawing_mode = "normal"
     ev = pygame.event.get()
     global dragging
     global selected_unit
@@ -23,7 +25,7 @@ def handle_events(screen, unit_circles, all_tiles, all_hexes, action_btns):
                             consumed = getattr(selected_unit, _action)()
                             if consumed == True:
                                 selected_unit = None
-                            return True
+                            return {"running": True, "drawing_mode": drawing_mode}
 
                 selected_unit = None
                 for _unit, _circle in unit_circles.items():
@@ -33,6 +35,10 @@ def handle_events(screen, unit_circles, all_tiles, all_hexes, action_btns):
                         _unit.selected = True
                     else:
                         _unit.selected = False
+
+                if tech_circle.collidepoint(pygame.mouse.get_pos()):
+                    print("tech circle clicked!!")
+                    drawing_mode = "tech"
             
             elif event.button == 3: # right click, move
                 if selected_unit is None:
@@ -78,4 +84,16 @@ def handle_events(screen, unit_circles, all_tiles, all_hexes, action_btns):
                         if _selected_tile in accessible_tiles_temp:
                             _selected_tile.tag = "dragged"
 
-    return running
+    
+    results = {"running": running, "drawing_mode": drawing_mode}
+    return results
+
+def handle_tech_events():
+    running = True
+    ev = pygame.event.get()
+    for event in ev:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            #import pdb; pdb.set_trace()
+            running = False
+
+    return {"running": running, "drawing_mode": "tech"}

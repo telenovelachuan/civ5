@@ -188,12 +188,31 @@ class City():
         self.owner.update_borders()
 
 class Tech():
-    def __init__(self, name, cost, unblock_bld=[]):
+    def __init__(self, name, cost, icons, unblock_bld=[]):
         self.name = name
         self.cost = cost
         self.leads_to = []
         self.dependencies = []
         self.unblock_bld = unblock_bld
+        self.completed = 0
+        self.in_progress = False
+        self.image = pygame.image.load(f'image/techs/{name.replace(" ", "_").lower()}.webp')
+        self.icons = []
+        for icon in icons:
+            suffix = "png" if icon.endswith("^") else "webp"
+            icon = icon.replace("^", "")
+            self.icons.append(pygame.image.load(f'image/icons/{icon}.{suffix}'))
+    
+    @property
+    def status(self):
+        if self.completed >= self.cost:
+            return "done"
+        if self.in_progress == True:
+            return "researching"
+        for _tech in self.dependencies:
+            if _tech.status != "done":
+                return "unresearchable"
+        return "ready"
 
 class Building():
     def __init__(self, name, cost, maintenance, required_tech):
